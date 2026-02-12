@@ -61,6 +61,13 @@ function App() {
     ));
   }, [currentGroupId, setGroups]);
 
+  // Mark all settlements as settled (clear expenses but keep members)
+  const markAllSettled = useCallback(() => {
+    if (window.confirm('Mark all settlements as completed? This will clear all expenses for this group.')) {
+      updateCurrentGroup({ expenses: [] });
+    }
+  }, [updateCurrentGroup]);
+
   // Create new group
   const handleCreateGroup = useCallback((name) => {
     const newGroup = createNewGroup(name);
@@ -139,6 +146,7 @@ function App() {
             <Summary
               members={currentGroup?.members || []}
               expenses={currentGroup?.expenses || []}
+              onSettleAll={markAllSettled}
             />
 
             <ExpenseForm

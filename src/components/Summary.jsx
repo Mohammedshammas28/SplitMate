@@ -1,5 +1,5 @@
 import React, { useMemo, useEffect, useState } from 'react';
-import { PieChart, ArrowRight, TrendingDown, TrendingUp, Wallet, Users, CheckCircle2 } from 'lucide-react';
+import { PieChart, ArrowRight, TrendingDown, TrendingUp, Wallet, Users, CheckCircle2, PartyPopper } from 'lucide-react';
 import { calculateSummary } from '../utils/splitLogic';
 
 const AnimatedNumber = ({ value, prefix = '', suffix = '' }) => {
@@ -31,7 +31,7 @@ const AnimatedNumber = ({ value, prefix = '', suffix = '' }) => {
     );
 };
 
-const Summary = ({ members, expenses }) => {
+const Summary = ({ members, expenses, onSettleAll }) => {
     const calculations = useMemo(() =>
         calculateSummary(members, expenses),
         [members, expenses]
@@ -52,11 +52,23 @@ const Summary = ({ members, expenses }) => {
                 </div>
                 
                 <div className="relative">
-                    <div className="flex items-center gap-2 mb-6">
-                        <div className="bg-white/20 backdrop-blur p-2 rounded-xl">
-                            <PieChart size={18} />
+                    <div className="flex items-center justify-between mb-6">
+                        <div className="flex items-center gap-2">
+                            <div className="bg-white/20 backdrop-blur p-2 rounded-xl">
+                                <PieChart size={18} />
+                            </div>
+                            <h2 className="font-bold uppercase tracking-wider text-sm text-white/90">Settlement Summary</h2>
                         </div>
-                        <h2 className="font-bold uppercase tracking-wider text-sm text-white/90">Settlement Summary</h2>
+                        {settlements.length > 0 && onSettleAll && (
+                            <button
+                                onClick={onSettleAll}
+                                className="flex items-center gap-2 px-4 py-2 bg-white/20 hover:bg-white/30 backdrop-blur rounded-xl text-sm font-semibold transition-all duration-200 active:scale-95"
+                            >
+                                <PartyPopper size={16} />
+                                <span className="hidden sm:inline">Mark All Settled</span>
+                                <span className="sm:hidden">Settle</span>
+                            </button>
+                        )}
                     </div>
                     
                     <div className="grid grid-cols-2 gap-6">

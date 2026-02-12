@@ -1,5 +1,6 @@
 /**
  * SplitMate Logic - pure functions for bill splitting calculations.
+ * Supports both equal and custom split modes.
  */
 
 export const calculateSummary = (members, expenses) => {
@@ -9,15 +10,38 @@ export const calculateSummary = (members, expenses) => {
     const perPerson = total / members.length;
 
     // 1. Calculate net balance for each person
-    // positive = paid more than share, negative = owes money
+    // For each expense:
+    //   - If equal split: divide amount equally among all members
+    //   - If custom split: use the customSplits object for each member's share
+    // positive balance = paid more than owed, negative = owes money
     const balances = {};
     members.forEach(member => {
-        balances[member] = -perPerson;
+        balances[member] = 0;
     });
 
     expenses.forEach(exp => {
+        // Credit the payer with the full amount
         if (balances.hasOwnProperty(exp.paidBy)) {
             balances[exp.paidBy] += exp.amount;
+        }
+
+        // Debit each member based on split type
+        if (exp.splitType === 'custom' && exp.customSplits) {
+            // Custom split: debit each member their specific share
+            members.forEach(member => {
+                const memberShare = parseFloat(exp.customSplits[member]) || 0;
+                if (balances.hasOwnProperty(member)) {
+                    balances[member] -= memberShare;
+                }
+            });
+        } else {
+            // Equal split: divide amount equally
+            const splitAmount = exp.amount / members.length;
+            members.forEach(member => {
+                if (balances.hasOwnProperty(member)) {
+                    balances[member] -= splitAmount;
+                }
+            });
         }
     });
 
